@@ -10,7 +10,7 @@ struct ContentView: View {
 
 
     enum Tab {
-        case start, material, jobs, createProject, singleGangView, employee, employees, preview, switches, themes, outletcounter, lightcounter, PDFImagesView, DeviceFinderAPI, API
+        case start, material, jobs, createProject, singleGangView, employee, employees, preview, switches, themes, outletcounter, lightcounter, PDFImagesView, DeviceFinderAPI, SwipingTimeView
     }
 
     @State private var selectedTab: Tab = .start // Track selected tab
@@ -63,8 +63,8 @@ struct ContentView: View {
 					case .DeviceFinderAPI:
 						DeviceFinderAPI()
 							.environmentObject(dataManager)
-					case .API:
-						API()
+					case .SwipingTimeView:
+						SwipingTimeView()
 							.environmentObject(dataManager)
 //
                 }

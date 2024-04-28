@@ -17,48 +17,53 @@ struct TimeKey: Hashable {
 struct PreViews: View {
     @EnvironmentObject var dataManager: DataManager
     @State private var navigateBack = false
-    
+	@State private var showAlertSuccess = false
+	@State private var showAlert = false
+	@State private var alertMessage = ""
 	func groupAndPrepareData() {
-		let projectID = dataManager.selectedJobID
-		var groupedEmployees = [TimeKey: [String]]()
-
-		for (employeeName, hoursString) in dataManager.employeeData {
-			let components = hoursString.components(separatedBy: " ")
-			let hours = components[0]
-			let minutes = components.count > 2 ? components[2] : "0"
-			let key = TimeKey(hours: hours, minutes: minutes)
-
-			if groupedEmployees[key] != nil {
-				groupedEmployees[key]?.append(employeeName)
-			} else {
-				groupedEmployees[key] = [employeeName]
-			}
-		}
-
-		for (timeKey, employeeNames) in groupedEmployees {
-			let employeeString = employeeNames.joined(separator: "; ")
-			let jsonBody: [String: Any] = [
-				"selectedEmployee": employeeString,
-				"projectID": projectID,
-				"hours": timeKey.hours,
-				"minutes": timeKey.minutes,
-			]
-			dataManager.jsonBodiesLocal.append((id: UUID(), jsonBody: jsonBody))
-		}
-		dataManager.jsonBodies = dataManager.jsonBodiesLocal
-	}
-
-
-	func submitTime(completion: @escaping (Bool, Error?) -> Void) {
         let projectID = dataManager.selectedJobID
+        let projectName = dataManager.selectedJobName
+        var groupedEmployees = [TimeKey: [String]]()
+
+        for (employeeName, hoursString) in dataManager.employeeData {
+            let components = hoursString.components(separatedBy: " ")
+            let hours = components[0]
+            let minutes = components.count > 2 ? components[2] : "0"
+            let key = TimeKey(hours: hours, minutes: minutes)
+
+            if groupedEmployees[key] != nil {
+                groupedEmployees[key]?.append(employeeName)
+            } else {
+                groupedEmployees[key] = [employeeName]
+            }
+        }
+
+        for (timeKey, employeeNames) in groupedEmployees {
+            let employeeString = employeeNames.joined(separator: "; ")
+            let jsonBody: [String: Any] = [
+                "selectedEmployee": employeeString,
+                "projectName": projectName,
+                "projectID": projectID,
+                "hours": timeKey.hours,
+                "minutes": timeKey.minutes,
+            ]
+            dataManager.jsonBodiesLocal.append((id: UUID(), jsonBody: jsonBody))
+        }
+        dataManager.jsonBodies = dataManager.jsonBodiesLocal
+    }
+
+    func submitTime(completion: @escaping (Bool, Error?) -> Void) {
+        let projectID = dataManager.selectedJobID
+        let projectName = dataManager.selectedJobName
         var groupedEmployees = [TimeKey: [String]]()
         // Streep 3: Loop through jsonBodies to print details and make API calls
-		for tuple in dataManager.jsonBodiesLocal {
-//			print("Inside the tuple json Bodies loop")
-			let jsonBody = tuple.jsonBody
-            if let jsonData = try? JSONSerialization.data(withJSONObject: jsonBody, options: []) {
-                // Print each projectID/employee/hours/minutes separately
+        for tuple in dataManager.jsonBodiesLocal {
+            //			print("Inside the tuple json Bodies loop")
+            let jsonBody = tuple.jsonBody
+			if let jsonData = try? JSONSerialization.data(withJSONObject: jsonBody, options: []) {
+				// Print each projectID/employee/hours/minutes separately
                 if let projectID = jsonBody["projectID"] as? String,
+                   let projectName = jsonBody["projectName"] as? String,
                    let employeeString = jsonBody["selectedEmployee"] as? String,
                    let hours = jsonBody["hours"] as? String,
                    let minutes = jsonBody["minutes"] as? String {
@@ -66,12 +71,16 @@ struct PreViews: View {
                 }
 
                 // Make the API call for each jsonBody
-                makeAPICall(with: jsonData, completion: { success, error in
-                    if success {
-                        print("Time submitted successfully for project: \(jsonBody["projectID"] ?? "")")
-                    } else if let error = error {
-                        print("Error submitting time for project: \(jsonBody["projectID"] ?? ""): \(error.localizedDescription)")
-                    }
+				makeAPICall(with: jsonData, completion: { success, error in
+					if success {
+						alertMessage = "Time submitted successfully for project: \(jsonBody["projectID"] ?? "")"
+						showAlert = true
+						completion(true, nil)
+					} else if let error = error {
+						alertMessage = "Error submitting time for project: \(jsonBody["projectID"] ?? ""): \(error.localizedDescription)"
+						showAlert = true
+						completion(false, error)
+					}
                 })
             } else {
                 print("Failed to create JSON data for project: \(jsonBody["projectID"] ?? "")")
@@ -79,47 +88,48 @@ struct PreViews: View {
             }
         }
 
-		dataManager.jsonBodies = dataManager.jsonBodiesLocal
+        dataManager.jsonBodies = dataManager.jsonBodiesLocal
         //
     }
 
     func makeAPICall(with jsonData: Data, completion: @escaping (Bool, Error?) -> Void) {
 //         Convert jsonData to a String and print it for testing purposes
-		print("makeAPICall(with jsonData: Data, completion: @escaping (Bool, Error?) -> Void) {")
-        	if let jsonString = String(data: jsonData, encoding: .utf8) {
-        		print("JSON String to be sent to the server for testing:\n")
-        		print("\(jsonString)\n")
-        	}
+        print("makeAPICall(with jsonData: Data, completion: @escaping (Bool, Error?) -> Void) {")
+        if let jsonString = String(data: jsonData, encoding: .utf8) {
+            print("JSON String to be sent to the server for testing:\n")
+            print("\(jsonString)\n")
+        }
 
-//        // Create the URL and URLRequest
-//        guard let url = URL(string: "https://api.antflix.net/submit_time") else {
-//            completion(false, nil)
-//            return
-//        }
-//
-//        var request = URLRequest(url: url)
-//        request.httpMethod = "POST"
-//        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-//        request.httpBody = jsonData
-//
-////        	 Perform the API request
-//        	let task = URLSession.shared.dataTask(with: request) { _, response, error in
-//        		if let error = error {
-//        			completion(false, error)
-//        		} else if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
-//        			completion(true, nil)
-//        		} else {
-//        			completion(false, nil)
-//        		}
-//        	}
-//        	task.resume()
+        // Create the URL and URLRequest
+        guard let url = URL(string: "https://api.antflix.net/submit_time") else {
+            completion(false, nil)
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = jsonData
+		print(jsonData)
+//        	 Perform the API request
+        let task = URLSession.shared.dataTask(with: request) { _, response, error in
+            if let error = error {
+                completion(false, error)
+            } else if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
+                completion(true, nil)
+            } else {
+                completion(false, nil)
+            }
+        }
+        task.resume()
     }
 
     var body: some View {
 //        let smsURLString = "sms:/open?addresses=\(retrieveAndFormatContacts())&body=\(dataManager.allSMSs)"
 
         //      let deviceBg = #colorLiteral(red: 0, green: 0.3725490196, blue: 1, alpha: 1)
-		VStack {
+
+        VStack {
             HStack {
                 Button(action: {
                     // Call the function here
@@ -146,12 +156,31 @@ struct PreViews: View {
             .font(.headline)
 
             VStack {
-				HStack {
-					List(dataManager.jsonBodiesLocal, id: \.id) { item in
-						Text("Project ID: \(item.jsonBody["projectID"] ?? ""), Employees: \(item.jsonBody["selectedEmployee"] ?? ""), Hours: \(item.jsonBody["hours"] ?? ""), Minutes: \(item.jsonBody["minutes"] ?? "")")
-					}.onAppear(){
-						print("list:\(dataManager.jsonBodies)")
-					}
+                HStack {
+                    List(dataManager.jsonBodiesLocal, id: \.id) { item in
+                        Section(header: Text("\(item.jsonBody["projectName"] ?? "")")
+//                            .backgroundStyle(Color.darkGray)
+                            .foregroundColor(Color.green)
+                            .lineSpacing(50)
+                            .font(.headline)
+                        ) {
+                            //							.font(.largeTitle)
+                            //							.foregroundColor(Color.green)
+                            //							.lineSpacing(50)
+                            //							.lineLimit(nil)
+                            //							.padding(){
+                            Text("Employees: ")
+                                .foregroundStyle(Color.blue)
+                                +
+                                Text("\(item.jsonBody["selectedEmployee"] ?? "")")
+                            Text("Time: ")
+                                .foregroundStyle(Color.blue)
+                                +
+                                Text("\(item.jsonBody["hours"] ?? "") hours, \(item.jsonBody["minutes"] ?? "") minutes")
+                        }
+                    }.onAppear {
+                        print("list:\(dataManager.jsonBodies)")
+                    }
                     .padding()
                     .background(Color(UIColor.systemBlue))
                     .foregroundColor(.white)
@@ -159,43 +188,45 @@ struct PreViews: View {
                     .multilineTextAlignment(.leading) // Aligning the text to the right
                     .font(.system(size: 14.0))
 
-                }.padding(.leading, 55).padding(.vertical, 10)
+                }.clipShape(RoundedRectangle(cornerRadius: 20))
+				.padding(.horizontal, 20)
+				.cornerRadius(20)
                 Spacer()
                 Divider().frame(height: 1.0).background(
                     Color("Color 6")
-                ).padding()
-            }.padding(.horizontal, 30)
-                .clipShape(RoundedRectangle(cornerRadius: 20)) // Adding rounded corners
-                .overlay(
-                    RoundedRectangle(cornerRadius: 20) // Overlay for border
-                        .stroke(Color("Color 6"), lineWidth: 1)
-                        .padding(.horizontal) // Border color and width
                 )
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 20)) // Adding rounded corners
+            .overlay(
+                RoundedRectangle(cornerRadius: 20) // Overlay for border
+                    .stroke(Color("Color 6"), lineWidth: 1)
+                    .padding(.horizontal) // Border color and width
+            )
             Spacer()
-            VStack {
+			VStack {
 				Button(action: {
 					submitTime { success, error in
 						if success {
-							print("Time submitted successfully.")
-							// Optionally clear jsonBodiesLocal after successful submission
+							alertMessage = "Time submitted successfully."
+							showAlert = true
 							dataManager.jsonBodiesLocal.removeAll()
+
 						} else if let error = error {
-							print("Error submitting time: \(error.localizedDescription)")
+							alertMessage = "Error submitting time: \(error.localizedDescription)"
+							showAlert = true
 						}
 					}
-				}, label: {
-					// ... existing button label code ...
+				}) {
+					Text("Submit Time")
+						.foregroundColor(.white)
+						.padding()
+						.background(Color.blue)
+						.cornerRadius(10)
+				}
+				.alert(isPresented: $showAlert) {
+					Alert(title: Text("Submission Status"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+				}
 
-                    Text("Send Message")
-                        .font(.title)
-                        .foregroundColor(Color.green)
-                        .background(Color.clear)
-                    Image(systemName: "arrow.up.circle.fill")
-                        .background(Color.clear)
-                        .foregroundStyle(Color.green)
-                        .font(.title)
-                })
-                // ... rest of your code
                 .buttonStyle(PlainButtonStyle()) //
                 .padding()
                 NavigationLink(destination: JobsView().navigationBarHidden(true)) {
@@ -214,15 +245,15 @@ struct PreViews: View {
                 .buttonStyle(PlainButtonStyle())
 //                .navigationBarBackButtonHidden(true)
 //                .navigationBarHidden(true)
-				.onAppear {
-					groupAndPrepareData()
-				}
+                .onAppear {
+                    groupAndPrepareData()
+                }
                 Divider().frame(height: 2.0).background(
                     Color("toolbar")
                 ).padding(.horizontal, 0)
             }
         }
-        .toolbar { MyToolbarItems() }
+		.toolbar { MyToolbarItems() }
         .background(Color("Color 7"))
         .navigationBarBackButtonHidden(true) // Hides the back button
         .navigationBarHidden(true)
@@ -249,37 +280,37 @@ struct PreViews: View {
         //                )
 
         //                            dismissButton: .default(Text("OK"))
-    }
+		}
 }
 
 func generateSMSBody() {
-	let sortedOutput = SMSGenerator.sortedFormat(dataManager: dataManager)
-	let smsBodyWithDate = SMSGenerator.generateSMSURL(
-		sortedOutput: sortedOutput)
-	// Append the generated SMS body to the array
-	if dataManager.allSMSBodies.last != smsBodyWithDate {
-		dataManager.allSMSBodies.append(smsBodyWithDate)
-	}
-	//        dataManager.allSMSBodies.append(smsBodyWithDate)
+    let sortedOutput = SMSGenerator.sortedFormat(dataManager: dataManager)
+    let smsBodyWithDate = SMSGenerator.generateSMSURL(
+        sortedOutput: sortedOutput)
+    // Append the generated SMS body to the array
+    if dataManager.allSMSBodies.last != smsBodyWithDate {
+        dataManager.allSMSBodies.append(smsBodyWithDate)
+    }
+    //        dataManager.allSMSBodies.append(smsBodyWithDate)
 
-	// Update savedData to show all stored SMS bodies
-	dataManager.allSMSs = dataManager.allSMSBodies.joined(separator: "\n\n")
+    // Update savedData to show all stored SMS bodies
+    dataManager.allSMSs = dataManager.allSMSBodies.joined(separator: "\n\n")
 }
 
 func retrieveAndFormatContacts() -> String {
-	let savedContacts = dataManager.retrieveSelectedContacts()
+    let savedContacts = dataManager.retrieveSelectedContacts()
 
-	// Extract the wewwwwwwwwfd                                               ffgfirst phone number of each contact and join them with a comma
-	let phoneNumbersString = savedContacts.compactMap { contact -> String? in
-		guard let firstPhoneNumber = contact.phoneNumbers.first?.value.stringValue else {
-			return nil // Skip contacts without phone numbers
-		}
-		print("firstphonenumber- \(firstPhoneNumber)")
-		return firstPhoneNumber
-	}.joined(separator: ", ")
-	print("phonenumberString- \(phoneNumbersString)")
+    // Extract the wewwwwwwwwfd                                               ffgfirst phone number of each contact and join them with a comma
+    let phoneNumbersString = savedContacts.compactMap { contact -> String? in
+        guard let firstPhoneNumber = contact.phoneNumbers.first?.value.stringValue else {
+            return nil // Skip contacts without phone numbers
+        }
+        print("firstphonenumber- \(firstPhoneNumber)")
+        return firstPhoneNumber
+    }.joined(separator: ", ")
+    print("phonenumberString- \(phoneNumbersString)")
 
-	return phoneNumbersString // Return the formatted string
+    return phoneNumbersString // Return the formatted string
 }
 
 func sendMessage(sms: String) {

@@ -9,8 +9,8 @@ struct JobsView: View {
 
 	@State private var searchText = ""
 	@State private var jobs = [[String]]()
-//	private let apiURL = "https://app.antflix.net/api/joblist"
-	private let apiURL = "https://api.antflix.net/get_projects"
+	private let apiURL = "http://10.0.1.29:9091/get_projects"
+//	private let apiURL = "https://api.antflix.net/get_projects"
 	@State private var showingPopover: [Int: Bool] = [:]
 	@State private var isEmployeeViewActive = false
 	
@@ -63,13 +63,12 @@ struct JobsView: View {
 									Text(job[2])
 									Spacer()
 									Button(action: {
-										if index < showingPopover.count {
-											showingPopover[index] = !(showingPopover[index] ?? false)
-										}
+										showingPopover[index] = !(showingPopover[index] ?? false)
 									}) {
 										Image(systemName: "info.circle")
 											.foregroundColor(.blue)
 									}
+
 									.popover(isPresented: Binding<Bool>(get: { showingPopover[index] ?? false }, set: { showingPopover[index] = $0 })) {
 										VStack {
 											// Define your popover content here
@@ -80,11 +79,11 @@ struct JobsView: View {
 											Spacer()
 											
 											Text("Job #-").font(.largeTitle).underline(Bool(true)).foregroundStyle(Color("Color 6"))
-											Text("\(job[0])").foregroundStyle(dataManager.themeColor).font(.title)
+											Text("\(job[2])").foregroundStyle(dataManager.themeColor).font(.title)
 											Spacer()
 											
 											Text("Date Created").font(.largeTitle).underline(Bool(true)).foregroundStyle(Color("Color 6"))
-											Text("\(job[2])").foregroundStyle(dataManager.themeColor).font(.title)
+											Text("\(job[3])").foregroundStyle(dataManager.themeColor).font(.title)
 											Spacer()
 										}
 									}
@@ -149,10 +148,10 @@ struct JobsView: View {
 				//                .onChange(of: jobs) { _ in
 				//                    updatePopoverArray()
 				//                }
-				.toolbar { MyToolbarItems() }
+//				.toolbar { MyToolbarItems() }
 				.navigationBarBackButtonHidden(true) // Hides the back button
 				.navigationBarHidden(true)
-				.background(Color("Color 7"))
+//				.background(Color("Color 7"))
 				.onChange(of: dataManager.isDarkMode) { newValue in
 					UserDefaults.standard.set(newValue, forKey: "isDarkMode")
 					if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
@@ -161,11 +160,14 @@ struct JobsView: View {
 					}
 				}
 			}
+			
+
 		}
 		.onAppear {
 			fetchData()
 			dataManager.employeeData = [:]
 		}
+		.toolbar { MyToolbarItems() }
 	}
 	
 	// Function to fetch data from API
@@ -174,20 +176,21 @@ struct JobsView: View {
 
 
 	private func fetchData() {
-//		dataManager.employeeData = [:]
 		dataManager.fetchEmployeeNames()
-
 		isLoading = true // Set isLoading to true when starting to fetch data
+
 		if let cachedJobs = UserDefaults.standard.array(forKey: "CachedJobs") as? [[String]], !isDataStale() {
-			jobs = cachedJobs
+			jobs = cachedJobs.sorted(by: { $0[3] < $1[3] }) // Sort cached jobs
 			isLoading = false
 			return
 		}
+
 		guard let url = URL(string: apiURL) else { return }
+
 		URLSession.shared.dataTask(with: url) { data, response, error in
 			DispatchQueue.main.async {
 				if let httpResponse = response as? HTTPURLResponse,
-				   !(200 ... 299).contains(httpResponse.statusCode) {
+				   !(200...299).contains(httpResponse.statusCode) {
 					print("Server returned status code: \(httpResponse.statusCode)")
 					self.isLoading = false
 					return
@@ -195,16 +198,17 @@ struct JobsView: View {
 
 				if let data = data {
 					let json = JSON(data)
-					// Parse the JSON data into the expected [[String]] format
 					var parsedJobs = [[String]]()
+
 					for (key, subJson):(String, JSON) in json {
 						let jobID = subJson["id"].stringValue
 						let jobNumber = subJson["number"].stringValue
-						// Assuming that the key is the job name
+						let jobDate = subJson["created_at"].stringValue
 						let jobName = key
-						parsedJobs.append([jobID, jobName, jobNumber])
+						parsedJobs.append([jobID, jobName, jobNumber, jobDate])
 					}
-					self.jobs = parsedJobs
+
+					self.jobs = parsedJobs.sorted(by: { $0[3] > $1[3] }) // Sort by jobDate
 					UserDefaults.standard.set(parsedJobs, forKey: "CachedJobs")
 					UserDefaults.standard.set(Date(), forKey: "LastRefreshDate")
 				} else if let error = error {
@@ -215,9 +219,7 @@ struct JobsView: View {
 			}
 		}.resume()
 	}
-	// Function to determine background color based on color scheme
-	// Function to determine background color based on color scheme
-	
+
 	private func isDataStale() -> Bool {
 		if let lastRefreshDate = UserDefaults.standard.object(forKey: "LastRefreshDate") as? Date {
 			let currentDate = Date()
