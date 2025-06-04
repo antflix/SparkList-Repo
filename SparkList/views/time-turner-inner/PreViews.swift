@@ -1,3 +1,4 @@
+#if false
 //
 //  PreView.swift
 //  project1
@@ -362,3 +363,4 @@ func sendMessage(sms: String) {
 //        return Path(bezierPath.cgPath)
 //    }
 // }
+#endif

@@ -1,3 +1,4 @@
+#if false
 import SwiftUI
 
 @available(iOS 17.0, *)
@@ -208,3 +209,4 @@ struct EmployeeRowView: View {
 }
 
 
+#endif

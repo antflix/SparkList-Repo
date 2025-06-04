@@ -1,3 +1,4 @@
+#if false
 import SwiftUI
 import ContactsUI
 
@@ -35,3 +36,4 @@ struct ContactPickerViewController: UIViewControllerRepresentable {
 }
 
 
+#endif

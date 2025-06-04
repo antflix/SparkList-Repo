@@ -1,3 +1,4 @@
+#if false
 // Created a new SwiftUI file for a modified version of the EmployeesView
 import SwiftUI
 @available(iOS 17.0, *)
@@ -281,3 +282,4 @@ struct EmployeeSelectionRow: View {
 
 }
 
+#endif

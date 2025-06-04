@@ -1,3 +1,4 @@
+#if false
 import SwiftUI
 struct AlarmSettingView: View {
 	@EnvironmentObject var dataManager: DataManager
@@ -65,3 +66,4 @@ struct AlarmSettingView: View {
 		return formatter.string(from: time)
 	}
 }
+#endif

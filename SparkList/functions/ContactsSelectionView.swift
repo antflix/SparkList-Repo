@@ -1,3 +1,4 @@
+#if false
 import SwiftUI
 import ContactsUI
 
@@ -82,3 +83,4 @@ struct ContactRow: View {
 	ContactsSelectionView()
 		.environmentObject(DataManager())
 }
+#endif

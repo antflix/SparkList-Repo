@@ -2,6 +2,7 @@
 // Copyright © 2024 Anthony. All rights reserved.
 // 
 
+#if false
 import SwiftUI
 
 @available(iOS 17.0, *)
@@ -232,3 +233,4 @@ struct SwipeMenu: View {
 //		// Fallback on earlier versions
 //	}
 //}
+#endif
