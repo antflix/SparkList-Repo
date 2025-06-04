@@ -101,42 +101,42 @@ struct StartView: View {
 //				.padding(.bottom, 5)
 //				.frame(maxWidth: .infinity, alignment: .topLeading)
 				Spacer()
-				NavigationLink(destination: SwipingTimeView()) {
-					Text("Swiping Time View")
-						.foregroundStyle(Color.white)
-						.padding(.top, 20)
-						.padding(.bottom, 20)
-						.frame(maxWidth: .infinity, alignment: .center)
-						.background(Color("button1"))
-						.cornerRadius(5)
-						.shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 2)
+//                                NavigationLink(destination: SwipingTimeView()) {
+//                                        Text("Swiping Time View")
+//                                                .foregroundStyle(Color.white)
+//                                                .padding(.top, 20)
+//                                                .padding(.bottom, 20)
+//                                                .frame(maxWidth: .infinity, alignment: .center)
+//                                                .background(Color("button1"))
+//                                                .cornerRadius(5)
+//                                                .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 2)
+//
+//                                }
+//                                .buttonStyle(PlainButtonStyle())
+//
+//                                .padding(.horizontal, 0)
+//                                .padding(.top, 0)
+//                                .padding(.bottom, 5)
+//                                .frame(maxWidth: .infinity, alignment: .topLeading)
 
-				}
-				.buttonStyle(PlainButtonStyle())
-
-				.padding(.horizontal, 0)
-				.padding(.top, 0)
-				.padding(.bottom, 5)
-				.frame(maxWidth: .infinity, alignment: .topLeading)
-
-Spacer()
-				NavigationLink(destination: JobsView()) {
-					Text("Time Turner-Inner")
-						.foregroundStyle(Color.white)
-						.padding(.top, 20)
-						.padding(.bottom, 20)
-						.frame(maxWidth: .infinity, alignment: .center)
-						.background(Color("button2"))
-						.cornerRadius(5)
-						.shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 2)
-					
-				}
-				.buttonStyle(PlainButtonStyle())
-
-				.padding(.horizontal, 0)
-				.padding(.top, 0)
-				.padding(.bottom, 5)
-				.frame(maxWidth: .infinity, alignment: .topLeading)
+//Spacer()
+//                                NavigationLink(destination: JobsView()) {
+//                                        Text("Time Turner-Inner")
+//                                                .foregroundStyle(Color.white)
+//                                                .padding(.top, 20)
+//                                                .padding(.bottom, 20)
+//                                                .frame(maxWidth: .infinity, alignment: .center)
+//                                                .background(Color("button2"))
+//                                                .cornerRadius(5)
+//                                                .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 2)
+//
+//                                }
+//                                .buttonStyle(PlainButtonStyle())
+//
+//                                .padding(.horizontal, 0)
+//                                .padding(.top, 0)
+//                                .padding(.bottom, 5)
+//                                .frame(maxWidth: .infinity, alignment: .topLeading)
 				
 				
 				
@@ -331,7 +331,7 @@ struct LandingPageView: View {
 			LazyVGrid(columns: columns, spacing: 20) {
 				FunctionTile(title: "Material List Generator", iconName: "list.bullet.rectangle")
 				FunctionTile(title: "Online Device Count", iconName: "network")
-				FunctionTile(title: "Time Turner-Inner\n", iconName: "clock.arrow.circlepath")
+//                                FunctionTile(title: "Time Turner-Inner\n", iconName: "clock.arrow.circlepath")
 				FunctionTile(title: "Offline Device Count", iconName: "desktopcomputer")
 			}
 			.padding()

@@ -99,26 +99,26 @@ class DataManager: ObservableObject {
 		//         self.selectedContact = DataManager.loadContact()
 		//         self.selectedPhoneNumber = DataManager.loadPhoneNumber()
 //		self.selectedTime = UserDefaults.standard.object(forKey: "selectedTime") as? Date ?? Date()
-		if let savedTime = UserDefaults.standard.object(forKey: "selectedTime") as? Date {
-			// If selectedTime has a value, set isAlarmSet to true and schedule the alarm
-			self.selectedTime = savedTime
-			self.isAlarmSet = true
-			print("in if statement")
-			scheduleAlarm(at: selectedTime, soundName: alarmNoise)
-		} else {
-			print("in else statement")
-			persistentMode = false
-			self.persistentMode = false
-			UserDefaults.standard.set(false, forKey: "persistentMode")
-			self.isAlarmSet = false
-			isAlarmSet = false
-			UserDefaults.standard.set(false, forKey: "isAlarmSet")
-			UserDefaults.standard.synchronize()
-			self.selectedTime = Date()
-			cancelAlarm()
-		}
-		
-		self.selectedContacts = retrieveSelectedContacts()
+//                if let savedTime = UserDefaults.standard.object(forKey: "selectedTime") as? Date {
+//                        // If selectedTime has a value, set isAlarmSet to true and schedule the alarm
+//                        self.selectedTime = savedTime
+//                        self.isAlarmSet = true
+//                        print("in if statement")
+//                        scheduleAlarm(at: selectedTime, soundName: alarmNoise)
+//                } else {
+//                        print("in else statement")
+//                        persistentMode = false
+//                        self.persistentMode = false
+//                        UserDefaults.standard.set(false, forKey: "persistentMode")
+//                        self.isAlarmSet = false
+//                        isAlarmSet = false
+//                        UserDefaults.standard.set(false, forKey: "isAlarmSet")
+//                        UserDefaults.standard.synchronize()
+//                        self.selectedTime = Date()
+//                        cancelAlarm()
+//                }
+
+//                self.selectedContacts = retrieveSelectedContacts()
 		
 
 	}
@@ -163,126 +163,126 @@ class DataManager: ObservableObject {
 			mcTotal = "Error: Invalid input"
 		}
 	}
-	func scheduleAlarm(at time: Date, soundName: String) {
-		print("daily alarm function")
-		print("isAlarmSet: \(isAlarmSet)")
-
-		print(#function)
-		if isAlarmSet {
-		let center = UNUserNotificationCenter.current()
-		UserDefaults.standard.set(time, forKey: "selectedTime")
-		let content = UNMutableNotificationContent()
-		content.title = "Turn In Time!!"
-	content.body = "It's time to turn in time!"
-		content.sound = UNNotificationSound(named: UNNotificationSoundName(rawValue: soundName))
-		let calendar = Calendar.current
-		let nowComponents = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: Date())
-		let now = calendar.date(from: nowComponents)!
-		let scheduledTimeComponents = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: time)
-		var scheduledTime = calendar.date(from: scheduledTimeComponents)!
-
-		if now > scheduledTime {
-			// If the time has already passed for today, schedule for the next day
-			scheduledTime = calendar.date(byAdding: .day, value: 1, to: scheduledTime)!
-		}
-
-		let trigger = UNCalendarNotificationTrigger(dateMatching: Calendar.current.dateComponents([.hour, .minute], from: scheduledTime), repeats: true)
-
-		let request = UNNotificationRequest(identifier: "dailyAlarm", content: content, trigger: trigger)
-
-		center.add(request) { error in
-			if let error = error {
-				print("Error scheduling daily notification: \(error.localizedDescription)")
-			} else {
-				print("dailyAlarm scheduled for \(dataManager.selectedTime)")
-			}
-		}
-			UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
-				for request in requests {
-					if request.identifier == "dailyAlarm" {
-						print("dailyAlarm has been verified as activated")
-					}
-
-				}
-			}
-		}
-	}
-	func clearSMS() {
-		dataManager.allSMSBodies.removeLast()
-
-	}
+//        func scheduleAlarm(at time: Date, soundName: String) {
+//                print("daily alarm function")
+//                print("isAlarmSet: \(isAlarmSet)")
+//
+//                print(#function)
+//                if isAlarmSet {
+//                let center = UNUserNotificationCenter.current()
+//                UserDefaults.standard.set(time, forKey: "selectedTime")
+//                let content = UNMutableNotificationContent()
+//                content.title = "Turn In Time!!"
+//        content.body = "It's time to turn in time!"
+//                content.sound = UNNotificationSound(named: UNNotificationSoundName(rawValue: soundName))
+//                let calendar = Calendar.current
+//                let nowComponents = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: Date())
+//                let now = calendar.date(from: nowComponents)!
+//                let scheduledTimeComponents = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: time)
+//                var scheduledTime = calendar.date(from: scheduledTimeComponents)!
+//
+//                if now > scheduledTime {
+//                        // If the time has already passed for today, schedule for the next day
+//                        scheduledTime = calendar.date(byAdding: .day, value: 1, to: scheduledTime)!
+//                }
+//
+//                let trigger = UNCalendarNotificationTrigger(dateMatching: Calendar.current.dateComponents([.hour, .minute], from: scheduledTime), repeats: true)
+//
+//                let request = UNNotificationRequest(identifier: "dailyAlarm", content: content, trigger: trigger)
+//
+//                center.add(request) { error in
+//                        if let error = error {
+//                                print("Error scheduling daily notification: \(error.localizedDescription)")
+//                        } else {
+//                                print("dailyAlarm scheduled for \(dataManager.selectedTime)")
+//                        }
+//                }
+//                        UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
+//                                for request in requests {
+//                                        if request.identifier == "dailyAlarm" {
+//                                                print("dailyAlarm has been verified as activated")
+//                                        }
+//
+//                                }
+//                        }
+//                }
+//        }
+//        func clearSMS() {
+//                dataManager.allSMSBodies.removeLast()
+//
+//        }
 	
-	func persistentAlarm(soundName: String) {
-		print("persistent alarm function")
-		print("isAlarmSet: \(isAlarmSet)")
-
-		if isAlarmSet {
-			let center = UNUserNotificationCenter.current()
-
-			let content = UNMutableNotificationContent()
-			content.title = "WARNING!!"
-			content.body = "Alarm will continue until you turn your time in!"
-			content.sound = UNNotificationSound(named: UNNotificationSoundName(rawValue: soundName))
-			let calendar = Calendar.current
-			let nowComponents = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: Date())
-			let now = calendar.date(from: nowComponents)!
-			let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 60, repeats: true)
-
-			let request = UNNotificationRequest(identifier: "persistentAlarm", content: content, trigger: trigger)
-
-			center.add(request) { error in
-				if let error = error {
-					print("Error scheduling persistent notification: \(error.localizedDescription)")
-				} else {
-					print("Persistent notification scheduled successfully, starting at \(now)")
-				}
-			}
-
-			UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
-				for request in requests {
-					if request.identifier == "persistentAlarm" {
-						print("persistentAlarm has been verified as activated")
-					}
-
-				}
-			}
-		}
-	}
-	func stopPersistentAlarm() {
-		UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["persistentAlarm"])
-		print("cancel persistence alarm")
-	}
-	func cancelAlarm() {
-		UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
-		UserDefaults.standard.set(false, forKey: "isAlarmSet")
-		UserDefaults.standard.synchronize()
-		print("cancel all alarms")
-	}
-	func fetchEmployeeNames() {
-		guard let url = URL(string: "https://api.antflix.net/get_employees") else {
-			print("Invalid URL")
-			return
-		}
-
-		URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
-			if let data = data {
-				let json = JSON(data)
-				var names: [String] = []
-				for (key, _) in json {
-					names.append(key)
-				}
-				// Sort the names if needed.
-				names.sort()
-
-				DispatchQueue.main.async {
-					// Updatde employeeNames on the main thread.
-					self?.employeeNames = names
-				}
-			} else if let error = error {
-				print("Error fetching employees: \(error.localizedDescription)")
-			}
-		}.resume()
-	}
+//        func persistentAlarm(soundName: String) {
+//                print("persistent alarm function")
+//                print("isAlarmSet: \(isAlarmSet)")
+//
+//                if isAlarmSet {
+//                        let center = UNUserNotificationCenter.current()
+//
+//                        let content = UNMutableNotificationContent()
+//                        content.title = "WARNING!!"
+//                        content.body = "Alarm will continue until you turn your time in!"
+//                        content.sound = UNNotificationSound(named: UNNotificationSoundName(rawValue: soundName))
+//                        let calendar = Calendar.current
+//                        let nowComponents = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: Date())
+//                        let now = calendar.date(from: nowComponents)!
+//                        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 60, repeats: true)
+//
+//                        let request = UNNotificationRequest(identifier: "persistentAlarm", content: content, trigger: trigger)
+//
+//                        center.add(request) { error in
+//                                if let error = error {
+//                                        print("Error scheduling persistent notification: \(error.localizedDescription)")
+//                                } else {
+//                                        print("Persistent notification scheduled successfully, starting at \(now)")
+//                                }
+//                        }
+//
+//                        UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
+//                                for request in requests {
+//                                        if request.identifier == "persistentAlarm" {
+//                                                print("persistentAlarm has been verified as activated")
+//                                        }
+//
+//                                }
+//                        }
+//                }
+//        }
+//        func stopPersistentAlarm() {
+//                UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["persistentAlarm"])
+//                print("cancel persistence alarm")
+//        }
+//        func cancelAlarm() {
+//                UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+//                UserDefaults.standard.set(false, forKey: "isAlarmSet")
+//                UserDefaults.standard.synchronize()
+//                print("cancel all alarms")
+//        }
+//        func fetchEmployeeNames() {
+//                guard let url = URL(string: "https://api.antflix.net/get_employees") else {
+//                        print("Invalid URL")
+//                        return
+//                }
+//
+//                URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
+//                        if let data = data {
+//                                let json = JSON(data)
+//                                var names: [String] = []
+//                                for (key, _) in json {
+//                                        names.append(key)
+//                                }
+//                                // Sort the names if needed.
+//                                names.sort()
+//
+//                                DispatchQueue.main.async {
+//                                        // Updatde employeeNames on the main thread.
+//                                        self?.employeeNames = names
+//                                }
+//                        } else if let error = error {
+//                                print("Error fetching employees: \(error.localizedDescription)")
+//                        }
+//                }.resume()
+//        }
 
 	// Array holding employee names
 
@@ -293,39 +293,39 @@ class DataManager: ObservableObject {
 	}
 
 
-	func saveSelectedContacts() {
-		let contactIdentifiers = self.selectedContacts.map { $0.identifier }
-		UserDefaults.standard.set(contactIdentifiers, forKey: "selectedContactsKey")
-	}
-	func retrieveSelectedContacts() -> [CNContact] {
-		print("retrieved contacts called")
-		guard let identifiers = UserDefaults.standard.object(forKey: "selectedContactsKey") as? [String] else {
-			return []
-		}
-		
-		let store = CNContactStore()
-		var contacts: [CNContact] = []
-		
-		// Request access to the contact store
-		let authorizationStatus = CNContactStore.authorizationStatus(for: .contacts)
-		guard authorizationStatus == .authorized else {
-			// Handle lack of permissions here
-			print("Not authorized to access contacts")
-			return []
-		}
-		
-		// Use predicates to fetch contacts in batches
-		let predicate = CNContact.predicateForContacts(withIdentifiers: identifiers)
-		let keysToFetch = [CNContactGivenNameKey, CNContactFamilyNameKey, CNContactPhoneNumbersKey] as [CNKeyDescriptor]
-		
-		do {
-			contacts = try store.unifiedContacts(matching: predicate, keysToFetch: keysToFetch)
-		} catch {
-			print("Error fetching contacts: \(error)")
-		}
-		
-		return contacts
-	}
+//        func saveSelectedContacts() {
+//                let contactIdentifiers = self.selectedContacts.map { $0.identifier }
+//                UserDefaults.standard.set(contactIdentifiers, forKey: "selectedContactsKey")
+//        }
+//        func retrieveSelectedContacts() -> [CNContact] {
+//                print("retrieved contacts called")
+//                guard let identifiers = UserDefaults.standard.object(forKey: "selectedContactsKey") as? [String] else {
+//                        return []
+//                }
+//
+//                let store = CNContactStore()
+//                var contacts: [CNContact] = []
+//
+//                // Request access to the contact store
+//                let authorizationStatus = CNContactStore.authorizationStatus(for: .contacts)
+//                guard authorizationStatus == .authorized else {
+//                        // Handle lack of permissions here
+//                        print("Not authorized to access contacts")
+//                        return []
+//                }
+//
+//                // Use predicates to fetch contacts in batches
+//                let predicate = CNContact.predicateForContacts(withIdentifiers: identifiers)
+//                let keysToFetch = [CNContactGivenNameKey, CNContactFamilyNameKey, CNContactPhoneNumbersKey] as [CNKeyDescriptor]
+//
+//                do {
+//                        contacts = try store.unifiedContacts(matching: predicate, keysToFetch: keysToFetch)
+//                } catch {
+//                        print("Error fetching contacts: \(error)")
+//                }
+//
+//                return contacts
+//        }
 
 	let deviceCategories: [String: [String]] = [
 		"Single Gang Category": ["Standard Bracket Box", "GFCI","Cut-In",

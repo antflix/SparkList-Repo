@@ -1,3 +1,4 @@
+#if false
 import SwiftUI
 import SwiftyJSON
 
@@ -247,3 +248,4 @@ struct JobsView: View {
 	}
 }
 
+#endif

@@ -59,49 +59,49 @@ struct MyToolbarItems: ToolbarContent {
 					}.padding()
 
 					Spacer()
-					HStack {
-						Button(action: {
-							isContactsPresented.toggle()
-						}) {
-							if !dataManager.selectedContacts.isEmpty {
-								
-								Image(systemName: "person.fill.badge.plus")
-									.font(Font.custom("Quicksand", size: 24).bold())
-									.aspectRatio(contentMode: .fit)
-									.symbolRenderingMode(.palette)
-									.foregroundStyle(Color.green, dataManager.themeColor)
-								
-							} else {
-								Image(systemName: "person.fill.questionmark")
-									.font(Font.custom("Quicksand", size: 24).bold())
-									.symbolRenderingMode(.palette)
-									.onAppear {
-										symbolAnimation.toggle()
-									}
-								
-									.foregroundStyle(Color.red, dataManager.themeColor)
-									.symbolEffect(.variableColor.reversing.cumulative, options: .repeat(100).speed(1), value: symbolAnimation)
-								
-							}
-						}
-						.popover(isPresented: $isContactsPresented, arrowEdge: .top) {
-							ContactsSelectionView().environmentObject(dataManager)
-						}
-					}
-					//            }
-					Spacer()
-					HStack {
-						Button(action: {
-							isPopoverPresented.toggle()
-						}) {
-							Image(systemName: "clock.arrow.2.circlepath")
-								.foregroundStyle(Color("Color 6"), dataManager.themeColor)
-								.font(Font.custom("Quicksand", size: 24).bold())
-						}
-						.popover(isPresented: $isPopoverPresented, arrowEdge: .top) {
-							AlarmSettingView()
-						}
-					}
+//                                        HStack {
+//                                                Button(action: {
+//                                                        isContactsPresented.toggle()
+//                                                }) {
+//                                                        if !dataManager.selectedContacts.isEmpty {
+//
+//                                                                Image(systemName: "person.fill.badge.plus")
+//                                                                        .font(Font.custom("Quicksand", size: 24).bold())
+//                                                                        .aspectRatio(contentMode: .fit)
+//                                                                        .symbolRenderingMode(.palette)
+//                                                                        .foregroundStyle(Color.green, dataManager.themeColor)
+//
+//                                                        } else {
+//                                                                Image(systemName: "person.fill.questionmark")
+//                                                                        .font(Font.custom("Quicksand", size: 24).bold())
+//                                                                        .symbolRenderingMode(.palette)
+//                                                                        .onAppear {
+//                                                                               symbolAnimation.toggle()
+//                                                                        }
+//
+//                                                                        .foregroundStyle(Color.red, dataManager.themeColor)
+//                                                                        .symbolEffect(.variableColor.reversing.cumulative, options: .repeat(100).speed(1), value: symbolAnimation)
+//
+//                                                        }
+//                                                }
+//                                                .popover(isPresented: $isContactsPresented, arrowEdge: .top) {
+//                                                        ContactsSelectionView().environmentObject(dataManager)
+//                                                }
+//                                        }
+//                                        //            }
+//                                        Spacer()
+//                                        HStack {
+//                                                Button(action: {
+//                                                        isPopoverPresented.toggle()
+//                                                }) {
+//                                                        Image(systemName: "clock.arrow.2.circlepath")
+//                                                                .foregroundStyle(Color("Color 6"), dataManager.themeColor)
+//                                                                .font(Font.custom("Quicksand", size: 24).bold())
+//                                                }
+//                                                .popover(isPresented: $isPopoverPresented, arrowEdge: .top) {
+//                                                        AlarmSettingView()
+//                                                }
+//                                        }
 					Spacer()
 					// Add an onTapGesture to the arrow.up.trash symbol
 					HStack {

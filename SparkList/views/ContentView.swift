@@ -10,7 +10,7 @@ struct ContentView: View {
 
 
     enum Tab {
-        case start, material, jobs, createProject, singleGangView, employee, employees, preview, switches, themes, outletcounter, lightcounter, PDFImagesView, DeviceFinderAPI, SwipingTimeView
+        case start, material, createProject, singleGangView, switches, themes, outletcounter, lightcounter, PDFImagesView, DeviceFinderAPI
     }
 
     @State private var selectedTab: Tab = .start // Track selected tab
@@ -21,9 +21,6 @@ struct ContentView: View {
                 case .start:
                     StartView()
                         .environmentObject(dataManager)
-                case .jobs:
-                    JobsView()
-
                 case .createProject:
                     MaterialListView()
                         .environmentObject(dataManager)
@@ -33,39 +30,27 @@ struct ContentView: View {
                 case .material:
                     MaterialFormView()
                         .environmentObject(dataManager)
-                case .employee:
-                    EmployeeView()
-//                          .toolbar{MyToolbarItems()}
-                        .environmentObject(dataManager)
-                case .employees:
-                    EmployeesViews()
-//                          .toolbar{MyToolbarItems()}
-                        .environmentObject(dataManager)
-                case .preview:
-                    PreViews()
-//                          .toolbar{MyToolbarItems()}
-                        .environmentObject(dataManager)
-					case .switches:
-						SwitchesView()
-							.environmentObject(dataManager)
-					case .themes:
-						ThemeView()
-							.environmentObject(dataManager)
-					case .outletcounter:
-						PanelSchedule()
-							.environmentObject(dataManager)
-					case .lightcounter:
-						LightCounter()
-							.environmentObject(dataManager)
-					case .PDFImagesView:
-						PDFImagesView()
-							.environmentObject(dataManager)
-					case .DeviceFinderAPI:
-						DeviceFinderAPI()
-							.environmentObject(dataManager)
-					case .SwipingTimeView:
-						SwipingTimeView()
-							.environmentObject(dataManager)
+                case .switches:
+                        SwitchesView()
+                                .environmentObject(dataManager)
+                case .themes:
+                        ThemeView()
+                                .environmentObject(dataManager)
+                case .outletcounter:
+                        PanelSchedule()
+                                .environmentObject(dataManager)
+                case .lightcounter:
+                        LightCounter()
+                                .environmentObject(dataManager)
+                case .PDFImagesView:
+                        PDFImagesView()
+                                .environmentObject(dataManager)
+                case .DeviceFinderAPI:
+                        DeviceFinderAPI()
+                                .environmentObject(dataManager)
+//                case .SwipingTimeView:
+//                        SwipingTimeView()
+//                                .environmentObject(dataManager)
 //
                 }
 
